@@ -12,6 +12,7 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
+
   app:
     build: .
     image: devops-app:1.0
@@ -24,7 +25,9 @@ services:
     networks:
       - backend
     restart: unless-stopped
+
 volumes:
   db_data:
+
 networks:
   backend:
