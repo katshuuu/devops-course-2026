@@ -355,3 +355,73 @@ curl --cacert ~/devops.crt https://devops.local/app/health   # [Хост] ok
 | Снимок | Момент создания | Состояние |
 |---|---|---|
 | `05-docker-compose` | 27.10.2026, после задания 2 ПР7 | Docker Engine, проект `app` (app + db), том `app_db_data` |
+
+## 10. Ansible
+
+**Расположение проекта:** каталог `ansible/` репозитория `devops-course-2026`.
+
+**Узлы**
+- управляющий: MacBook (macOS), ansible-core 2.18, sshpass, коллекции из `ansible/requirements.yml`;
+- управляемый: VM `devops-vm`, Ubuntu Server 24.04 arm64, Host-only адрес 192.168.56.101, SSH на порту 22.
+
+**Inventory**
+- `inventory/bootstrap.ini` - первичный запуск от `student` (пароль запрашивается интерактивно, в файле его нет);
+- `inventory/prod.ini` - запуски от `devops` по ключу `~/.ssh/devops_vm`.
+
+**Роли**
+- `base` - проверка платформы, базовые пакеты, репозиторий Docker, Docker Engine;
+- `ssh` - пользователь `devops`, ключ, sudo, hardening SSH, UFW (22 и 80);
+- `nginx` - reverse proxy на 127.0.0.1:5000, проверка `nginx -t` перед reload;
+- `app` - загрузка образа по SHA, контейнер, проверка `/health`.
+
+**Приложение**
+- образ: `ghcr.io/katshuuu/devops-ci-app`;
+- версия: полный SHA в `ansible/group_vars/all.yml` (переменная `app_tag`), тег `latest` не используется;
+- порт контейнера: 5000, опубликован только на 127.0.0.1;
+- health endpoint: `/health`.
+
+**Команды** (из каталога `ansible/`)
+
+```bash
+# первичный запуск
+ansible-playbook -i inventory/bootstrap.ini site.yml --ask-pass --ask-become-pass
+# повторные запуски (идемпотентность: changed=0)
+ansible-playbook site.yml
+# read-only аудит
+ansible-playbook verify.yml
+Пароли и закрытый ключ в репозиторий не включаются.
+
+## 10. Ansible
+
+**Расположение проекта:** каталог `ansible/` репозитория `devops-course-2026`.
+
+**Узлы**
+- управляющий: MacBook (macOS), ansible-core 2.18, sshpass, коллекции из `ansible/requirements.yml`;
+- управляемый: VM `devops-vm`, Ubuntu Server 24.04 arm64, Host-only адрес 192.168.56.101, SSH на порту 22.
+
+**Inventory**
+- `inventory/bootstrap.ini` - первичный запуск от `student` (пароль запрашивается интерактивно, в файле его нет);
+- `inventory/prod.ini` - запуски от `devops` по ключу `~/.ssh/devops_vm`.
+
+**Роли**
+- `base` - проверка платформы, базовые пакеты, репозиторий Docker, Docker Engine;
+- `ssh` - пользователь `devops`, ключ, sudo, hardening SSH, UFW (22 и 80);
+- `nginx` - reverse proxy на 127.0.0.1:5000, проверка `nginx -t` перед reload;
+- `app` - загрузка образа по SHA, контейнер, проверка `/health`.
+
+**Приложение**
+- образ: `ghcr.io/katshuuu/devops-ci-app`;
+- версия: полный SHA в `ansible/group_vars/all.yml` (переменная `app_tag`), тег `latest` не используется;
+- порт контейнера: 5000, опубликован только на 127.0.0.1;
+- health endpoint: `/health`.
+
+**Команды** (из каталога `ansible/`)
+
+```bash
+# первичный запуск
+ansible-playbook -i inventory/bootstrap.ini site.yml --ask-pass --ask-become-pass
+# повторные запуски (идемпотентность: changed=0)
+ansible-playbook site.yml
+# read-only аудит
+ansible-playbook verify.yml
+Пароли и закрытый ключ в репозиторий не включаются.
