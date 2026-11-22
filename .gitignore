@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 venv/
 .DS_Store
+
+# Large local ML corpora for PR-12 (download via script)
+pr12_kmeans/KMeans/20_Newsgroups/
+pr12_kmeans/KMeans.zip
+pr12_kmeans/**/*.tar.gz
